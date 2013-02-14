@@ -1,3 +1,4 @@
 npm-debug.log
 public/stylesheets/*.css
 public/javascripts/assets.js
+**/.DS_Store
