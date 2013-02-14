@@ -1,6 +1,6 @@
 ## Introduction
 
-This is a skeleton app that I created to help speed up the developemnt process for new node.js web apps. It uses Backbone.js as the frontend and MongoDB for a persistence database. The 
+This is a skeleton app that I created to help speed up the developemnt process for new Node.js web apps. It uses Backbone.js as the frontend and MongoDB for a persistence database. 
 
 #### Technologies Used
 
