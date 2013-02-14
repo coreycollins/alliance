@@ -14,4 +14,4 @@ This is a skeleton app that I created to help speed up the developemnt process f
 - [Mongoose](http://mongoosejs.com/) - A MongoDB object modeling tool designed to work in an asynchronous environment.
 - [MongoDB](http://www.mongodb.org/) - A scalable, high-performance, open source NoSQL database.
 - [Jammit](http://documentcloud.github.com/jammit/) - Asset packing library ment for Rails, but works great here.
-- [Watchr](https://github.com/bevry/watchr) File system watching library that coupled with a simple util script, watches the models, controllers, and client-utils directories for changes and automatically runs jammit to re-compile. 
+- [Watchr](https://github.com/bevry/watchr) - File system watching library that coupled with a simple util script, watches the models, controllers, and client-utils directories for changes and automatically runs jammit to re-compile. 
