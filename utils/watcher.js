@@ -20,7 +20,7 @@
 
   exports.watch = function() {
     watchr.watch({
-      paths: ['models/','controllers/','client-utils'],
+      paths: ['models/','controllers/','client-utils/', 'views/'],
       listeners: {
         error: function(err){
             console.log('an error occured:', err);

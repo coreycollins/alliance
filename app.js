@@ -9,7 +9,7 @@ var watcher = require('./utils/watcher');
 watcher.packageFiles();
 
 app.configure(function () {
-  app.set('views', __dirname + '/views');
+  app.set('views', __dirname + '/templates');
   app.set('view engine', 'jade');
   app.use(express.favicon());
   app.use(express.logger('dev'));
