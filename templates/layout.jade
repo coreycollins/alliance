@@ -2,8 +2,11 @@
 html
   head
     title= title
-    script(type="text/javascript", src="/javascripts/assets.js")
     link(rel='stylesheet', href='/stylesheets/base.css')
 
   body
     block content
+    block templates
+
+    script(type="text/javascript", src="/javascripts/assets.js")
+

@@ -9,3 +9,4 @@ javascripts:
     - models/*.js
     - controllers/*.js
     - client-utils/*.js
+    - views/*.js

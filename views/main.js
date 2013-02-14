@@ -4,12 +4,22 @@ $(function ($, _, Backbone) {
 
     el: '#main',
 
+    footerTemplate: _.template( $('#footer-template').html() ),
+
     events: {
     },
 
-    // Re-render the titles of the todo item.
-    render: function() {
+    initialize: function() {
+      this.$footer = this.$('#footer');
+      this.$main = this.$('#main');
 
+      this.render();
+    },
+
+    render: function() {
+      this.$footer.html(this.footerTemplate({
+          name: 'Corey Collins'
+      }));
     }
 
   });

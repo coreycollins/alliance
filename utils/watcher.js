@@ -19,6 +19,7 @@
   };
 
   exports.watch = function() {
+    var watcher = this;
     watchr.watch({
       paths: ['models/','controllers/','client-utils/', 'views/'],
       listeners: {
@@ -33,7 +34,7 @@
             }
         },
         change: function(changeType,filePath,fileCurrentStat,filePreviousStat){
-          packageFiles();
+          watcher.packageFiles();
         }
       }
     });
