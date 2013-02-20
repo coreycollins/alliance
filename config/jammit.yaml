@@ -7,7 +7,7 @@ javascripts:
     - dependencies/underscore-min.js
     - dependencies/backbone-min.js
     - dependencies/backbone-associations-min.js
-    - dependencies/bootstrap-min.js
+    - dependencies/bootstrap.min.js
     - models/*.js
     - controllers/*.js
     - views/*.js

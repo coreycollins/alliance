@@ -6,8 +6,6 @@ var routes = require('./config/routes');
 var app = express();
 var watcher = require('./utils/watcher');
 
-watcher.packageFiles();
-
 app.configure(function () {
   app.set('views', __dirname + '/templates');
   app.set('view engine', 'jade');
@@ -20,15 +18,23 @@ app.configure(function () {
   app.use(app.router);
 });
 
+var port;
+
 app.configure('development', function () {
+  watcher.packageFiles();
   app.use(express.errorHandler());
   watcher.watch();
+  port = 3000;
+});
+
+app.configure('production', function () {
+  port = 80;
 });
 
 routes.init(app);
 
 mongoose.connect("127.0.0.1", "alliance", 27017);
 
-http.createServer(app).listen(3000);
+http.createServer(app).listen(port);
 
-console.log("Express server listening on port 3000");
+console.log("Express server listening on port "+port);
