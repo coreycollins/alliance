@@ -21,7 +21,7 @@
   exports.watch = function() {
     var watcher = this;
     watchr.watch({
-      paths: ['models/','controllers/','client-utils/', 'views/'],
+      paths: ['models/','controllers/','client-utils/', 'views/', 'backbone/'],
       listeners: {
         error: function(err){
             console.log('an error occured:', err);

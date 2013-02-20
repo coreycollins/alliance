@@ -27,7 +27,7 @@ app.configure('development', function () {
 
 routes.init(app);
 
-mongoose.connect("127.0.0.1", "skeleton", 27017);
+mongoose.connect("127.0.0.1", "alliance", 27017);
 
 http.createServer(app).listen(3000);
 

@@ -38,7 +38,7 @@
         if (!err) {
           res.send(m);
         } else {
-          res.send(errMsg(err));
+          res.send(500, errMsg(err));
         }
       });
     };
@@ -75,7 +75,7 @@
           if (!err) {
             res.send(result);
           } else {
-            res.send(errMsg(err));
+            res.send(500, errMsg(err));
           }
         });
       });

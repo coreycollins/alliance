@@ -1,30 +1,61 @@
-$(function ($, _, Backbone) {
+var app = app || {};
 
-  var MainView = Backbone.View.extend({
+app.MainView = Backbone.View.extend({
 
-    el: '#main',
+  el: '#main',
 
-    footerTemplate: _.template( $('#footer-template').html() ),
+  events: {
+    'keypress #new-goal':'newGoal',
+    'click #archive': 'archive'
+  },
 
-    events: {
-    },
+  initialize: function() {
+    this.$main = this.$('#main');
+    this.input = this.$('#new-goal');
+    this.action = this.$('#archive');
 
-    initialize: function() {
-      this.$footer = this.$('#footer');
-      this.$main = this.$('#main');
+    window.app.Users.on( 'reset', this.addAll, this );
 
-      this.render();
-    },
+    window.app.Users.fetch();
 
-    render: function() {
-      this.$footer.html(this.footerTemplate({
-          name: 'Corey Collins'
-      }));
+  },
+
+  addOne: function( user ) {
+    var view = new app.UserView({ model: user });
+    $('#user-list').append( view.render().el );
+  },
+
+  addAll: function() {
+    this.$('#todo-list').html('');
+    app.Users.each(this.addOne, this);
+    $('.user').first().click();
+  },
+
+  newGoal: function(e) {
+
+    if ( e.which !== 13 || !this.input.val().trim() ) {
+      return;
     }
 
-  });
+    var selected = this.$('.user.selected');
+    var user = app.Users.at(selected.index());
+    user.createGoal(this.input.val().trim());
 
-  // Create the app
-  var mainView = new MainView();
-  
-}(jQuery, _, Backbone));
+    this.input.val('');
+  },
+
+  archive: function() {
+    var selected = this.$('.user.selected');
+    var user = app.Users.at(selected.index());
+    var goals = user.get("goals");
+    $('.goal').each(function(index, element){
+      var checkbox = $(element).find('.checkbox');
+      if (checkbox.is(":checked")){
+        var id = $(element).find('.hashtag').text();
+        goals.remove(goals.where({'hashtag':id}));
+      }
+    });
+    user.save();
+  }
+
+});

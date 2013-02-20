@@ -2,9 +2,30 @@ extends layout
 
 block content
   #main
-    h1 It Works!
-    #footer
+    #sidebar
+      ul#user-list
+    #content
+      <input id="new-goal" placeholder="Hashtag for new goal...">
+      ul#goals-list
+    #mentions
+      button#archive.btn.btn-primary Archive
+      ul#mentions-list
+  #logo.pull-right The Alliance
+
 
 block templates
-  script#footer-template(type="text/template")
-    a(href="http://google.com") <%= name %>
+  script#user-template(type="text/template")
+    | <img src="<%= link %>" />
+  script#goal-template(type="text/template")
+    .action
+      <input type="checkbox" class="checkbox">
+    .details
+      div.hashtag <%= hashtag %>
+      div.description <%= description %>
+      <input class="edit" value="<%= description %>">
+    <div class="prog <%= completed %>"> <%= progress %>%</div>
+  script#mention-template(type="text/template")
+    .message <%= message %>
+    .seperator . . .
+  
+
