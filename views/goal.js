@@ -84,10 +84,12 @@ app.GoalView = Backbone.View.extend({
   addAllMentions: function() {
     $('#mentions-list').html('');
     var mentions = this.model.get('mentions');
-    mentions.comparator = function(mention) {
-      return (new Date(mention.get('created_at'))).getTime();
+    if (mentions) {
+      mentions.comparator = function(mention) {
+        return (new Date(mention.get('created_at'))).getTime();
+      }
+      mentions.each(this.addMention,this);
     }
-    mentions.each(this.addMention,this);
   }
 
 });

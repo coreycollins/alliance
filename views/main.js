@@ -52,10 +52,11 @@ app.MainView = Backbone.View.extend({
       var checkbox = $(element).find('.checkbox');
       if (checkbox.is(":checked")){
         var id = $(element).find('.hashtag').text();
-        goals.remove(goals.where({'hashtag':id}));
+        var matched = goals.where({'hashtag':id});
+        goals.remove(matched);
       }
     });
     user.save();
-  }
+  },
 
 });

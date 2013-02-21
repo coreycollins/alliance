@@ -19,8 +19,10 @@ app.UserView = Backbone.View.extend({
   // app, we set a direct reference on the model for convenience.
   initialize: function() {
     this.model.on('reset', this.show, this );
-    this.model.on('add:goals', this.addGoal, this);
+    //this.model.on('add:goals', this.addGoal, this);
     this.model.on('error', this.errors, this );
+    this.model.on('reset:goals', this.addAllGoals, this);
+    //this.model.on('remove:goals', this.removeGoals, this);
   },
 
   // Re-renders the todo item to the current state of the model and

@@ -281,10 +281,12 @@ app.GoalView = Backbone.View.extend({
   addAllMentions: function() {
     $('#mentions-list').html('');
     var mentions = this.model.get('mentions');
-    mentions.comparator = function(mention) {
-      return (new Date(mention.get('created_at'))).getTime();
+    if (mentions) {
+      mentions.comparator = function(mention) {
+        return (new Date(mention.get('created_at'))).getTime();
+      }
+      mentions.each(this.addMention,this);
     }
-    mentions.each(this.addMention,this);
   }
 
 });
@@ -342,11 +344,12 @@ app.MainView = Backbone.View.extend({
       var checkbox = $(element).find('.checkbox');
       if (checkbox.is(":checked")){
         var id = $(element).find('.hashtag').text();
-        goals.remove(goals.where({'hashtag':id}));
+        var matched = goals.where({'hashtag':id});
+        goals.remove(matched);
       }
     });
     user.save();
-  }
+  },
 
 });
 
@@ -402,8 +405,10 @@ app.UserView = Backbone.View.extend({
   // app, we set a direct reference on the model for convenience.
   initialize: function() {
     this.model.on('reset', this.show, this );
-    this.model.on('add:goals', this.addGoal, this);
+    //this.model.on('add:goals', this.addGoal, this);
     this.model.on('error', this.errors, this );
+    this.model.on('reset:goals', this.addAllGoals, this);
+    //this.model.on('remove:goals', this.removeGoals, this);
   },
 
   // Re-renders the todo item to the current state of the model and
