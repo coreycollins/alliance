@@ -44,7 +44,9 @@ function getMembers() {
 };
 
 function createMention(user, post, hashtag, goal, callback) {
-  var link = post.actions[0].link;
+  var ids = post.id.split("_");
+  var link = "http://www.facebook.com/"+ids[0]+"/posts/"+ ids[1];
+
   var mention = _.find(goal.mentions, function(m){ return m.post_id == post.id; });
   if (!mention) {
     goal.mentions.push({link:link, message:post.message, post_id:post.id, created_at: new Date()});
@@ -59,7 +61,7 @@ function createMention(user, post, hashtag, goal, callback) {
 }
 
 function createGoal(user, post, hashtag, callback){
-  var link = post.actions[0].link;
+  var link = post.actions != undefined ? post.actions[0].link : '';
 
   if (post.likes && post.likes.count > (USERS)) {
     var mention = {link:link, message:post.message, post_id:post.id, created_at: new Date()};
@@ -78,7 +80,46 @@ function createGoal(user, post, hashtag, callback){
 
 };
 
-function parsePost(post, callback){
+
+function parseComment(comment, callback) {
+  var hashtags = comment.message.match(/(#\w+)/g);
+
+  if (hashtags) {
+
+    User.findOne({fb_id:comment.from.id}, function(err, user){
+      if (hashtags.length > 0) {
+        _.each(hashtags, function(hashtag){
+          //console.log(hashtag);
+          //////////// Split hashtag to get progress and hashtag
+          var splits = hashtag.split('_');
+          var progress;
+          if (splits.length > 1) { 
+            progress = _.last(splits); 
+            hashtag = hashtag.replace(("_"+progress),''); 
+          }
+          ////////////
+
+          var goal = _.find(user.goals, function(g){ return g.hashtag == hashtag; });
+
+          if(goal) {
+            goal.progress = progress ? progress : goal.progress;
+            createMention(user, comment, hashtag, goal, callback);
+          }
+          else {
+            callback();
+          }
+
+        });
+      }
+      else { callback(); }
+
+    });
+
+  }
+  else { callback(); }
+};
+
+function parseMain(post, callback){
 
   // CHECK MESSAGE FOR HASHTAGS
   var match = post.message.match(/.*(#\w+).*/);
@@ -88,8 +129,8 @@ function parsePost(post, callback){
       var hashtags = post.message.match(/(#\w+)/g);
 
       if (hashtags.length > 0) {
-        _.each(hashtags, function(hashtag){
-          console.log(hashtag);
+        var hashtag = hashtags[0];
+        async.eachSeries(hashtags, function(hashtag, callback2){
 
           //////////// Split hashtag to get progress and hashtag
           var splits = hashtag.split('_');
@@ -103,37 +144,49 @@ function parsePost(post, callback){
           var goal = _.find(user.goals, function(g){ return g.hashtag == hashtag; });
 
           if (!goal && !progress) {
-            createGoal(user, post, hashtag, callback);
+            createGoal(user, post, hashtag, callback2);
           }
           else if(goal) {
             goal.progress = progress ? progress : goal.progress;
-            createMention(user, post, hashtag, goal, callback);
+            createMention(user, post, hashtag, goal, callback2);
           }
           else {
-            callback();
+            callback2();
           }
 
-        });
+        }, callback);
       }
       else { callback(); }
 
     });
   }
-  else { 
-
-    var comments = JSON.parse(post.comments.data);
-    console.log(comments);
-
-    callback();
-  }
+  else { callback(); }
+  
 };
+
+function parsePost(post, callback) {
+
+  parseMain(post, function(){
+
+    // Now parse comments
+    var comments = post.comments.data;
+    if (comments && comments.length > 0) {
+      async.eachSeries(comments, parseComment, callback);
+    }
+    else { callback(); }
+
+  });
+}
+
 
 function getGoals(){
   request("https://graph.facebook.com/409434605800948/feed?access_token="+ACCESS_TOKEN, function(error, response, body) {
     if (!error && response.statusCode == 200) {
       var data = JSON.parse(body);
       var posts = _.sortBy(data.data, function(post){ return new Date(post.created_time); });
-      async.eachSeries(posts, parsePost);
+      async.eachSeries(posts, parsePost, function(){
+        console.log("Done parsing goals.");
+      });
     }
     else {
       console.log("Error: ", body);
@@ -141,10 +194,10 @@ function getGoals(){
   });
 };
 
-//timer.setInterval( function(){
+timer.setInterval( function(){
   //getMembers();
   getGoals();
-//}, 10000);
+}, 10000);
 
 
 /*
