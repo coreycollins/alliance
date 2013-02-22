@@ -79,6 +79,8 @@ function createGoal(user, post, hashtag, callback){
 };
 
 function parsePost(post, callback){
+
+  // CHECK MESSAGE FOR HASHTAGS
   var match = post.message.match(/.*(#\w+).*/);
   if (match) {
 
@@ -118,6 +120,10 @@ function parsePost(post, callback){
     });
   }
   else { 
+
+    var comments = JSON.parse(post.comments.data);
+    console.log(comments);
+
     callback();
   }
 };
@@ -135,10 +141,10 @@ function getGoals(){
   });
 };
 
-timer.setInterval( function(){
-  getMembers();
+//timer.setInterval( function(){
+  //getMembers();
   getGoals();
-}, 10000);
+//}, 10000);
 
 
 /*
