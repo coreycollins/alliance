@@ -262,15 +262,17 @@ app.GoalView = Backbone.View.extend({
   },
 
   highlight: function() {
-    if (this.$el.hasClass('active')) {
-      this.$el.removeClass('active');
-      $('#mentions').hide();
-    }
-    else {
-      $('.goal.active').removeClass('active');
-      this.$el.addClass('active');
-      $('#mentions').show();
-      this.addAllMentions();
+    if (this.model.get('progress') < 100) {
+      if (this.$el.hasClass('active')) {
+        this.$el.removeClass('active');
+        $('#mentions').hide();
+      }
+      else {
+        $('.goal.active').removeClass('active');
+        this.$el.addClass('active');
+        $('#mentions').show();
+        this.addAllMentions();
+      }
     }
   },
 
@@ -325,20 +327,7 @@ app.MainView = Backbone.View.extend({
     this.input = this.$('#new-goal');
     this.action = this.$('#archive');
 
-    /*
-    $(window).scroll( function(){
-      var offset = $(window).scrollTop();
-      if (offset <= 0) {
-        $('#mentions').css('top', 80);
-      }
-      else if (offset <= 80) {
-        $('#mentions').css('top', 80-offset);
-      }
-      else {
-        $('#mentions').css('top', 0);
-      }
-    });
-*/
+    this.setMentionsHeight();
 
     window.app.Users.on( 'reset', this.addAll, this );
 
@@ -383,6 +372,10 @@ app.MainView = Backbone.View.extend({
       }
     });
     user.save();
+  },
+
+  setMentionsHeight: function(){
+    $('#mentions').css('height',window.innerHeight-80);
   }
 
 });

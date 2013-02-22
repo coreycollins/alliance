@@ -13,6 +13,10 @@ body
   background-image: url('/images/pw_maze_black.png')
   width: 100%; 
   overflow: auto
+  position: fixed
+  top: 0
+  left: 0
+  z-index:10000
 
 #content
   border-right: 1px solid #ccc
@@ -20,12 +24,13 @@ body
   max-width: 479px
   width: 100%
   position: absolute
+  top: 80px
   min-height: 100%
 
 #mentions
-  position: absolute
+  position: fixed
   right: 0
-  top: 80
+  top: 80px
   height: 100%
   overflow: auto
   width: 40%
@@ -34,11 +39,12 @@ body
   display: none
   //z-index: -10000
 
+
 #mentions-list
   list-style: none
   overflow: hidden
   margin: 10px 0 0 0
-  padding: 0 10px
+  padding: 0 10px 10px 10px
 
 .header-section
   width: 80%
