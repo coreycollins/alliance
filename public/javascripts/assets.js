@@ -120,7 +120,8 @@ $(function ($, _, Backbone) {
       hashtag: '#newgoal',
       description: 'Double click to enter a description...',
       parent_id: '',
-      progress: 0
+      progress: 0,
+      archived: false
     }
 
   });
@@ -222,9 +223,15 @@ app.GoalView = Backbone.View.extend({
   },
 
   render: function() {
-    var json = this.model.toJSON();
-    json['completed'] = (this.model.get("progess") == 100) ? 'completed' : '';
-    this.$el.html( this.template(json));
+    this.$el.html( this.template(this.model.toJSON()));
+
+    if (this.model.get('progress') == 100) {
+      this.$el.addClass('completed');
+      var prog = this.$el.find('.prog');
+      prog.text('');
+      prog.addClass('icon-ok');
+    }
+
     this.input = this.$('.edit');
     return this;
   },
@@ -235,8 +242,9 @@ app.GoalView = Backbone.View.extend({
   },
 
   delete: function() {
-    this.options.user.get("goals").remove(this.model);
+    this.model.set('archived',true);
     this.options.user.save();
+    this.remove();
   },
 
   remove: function() {
@@ -317,6 +325,7 @@ app.MainView = Backbone.View.extend({
     this.input = this.$('#new-goal');
     this.action = this.$('#archive');
 
+    /*
     $(window).scroll( function(){
       var offset = $(window).scrollTop();
       if (offset <= 0) {
@@ -329,6 +338,7 @@ app.MainView = Backbone.View.extend({
         $('#mentions').css('top', 0);
       }
     });
+*/
 
     window.app.Users.on( 'reset', this.addAll, this );
 
@@ -468,9 +478,13 @@ app.UserView = Backbone.View.extend({
     $('#goals-list').html('');
     var goals = this.model.get('goals');
     goals.comparator = function(goal) {
-      return (new Date(goal.get('created_at'))).getTime();
+      var date = (new Date(goal.get('created_at'))).getTime();
+      if (goal.get('progress') >= 100) {
+        return -date;
+      }
+      return date;
     }
-    goals.each(this.addGoal,this);
+    _.each(goals.sort({silent:true}).where({archived:false}),this.addGoal,this);
   }
 
 });

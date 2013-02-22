@@ -58,9 +58,13 @@ app.UserView = Backbone.View.extend({
     $('#goals-list').html('');
     var goals = this.model.get('goals');
     goals.comparator = function(goal) {
-      return (new Date(goal.get('created_at'))).getTime();
+      var date = (new Date(goal.get('created_at'))).getTime();
+      if (goal.get('progress') >= 100) {
+        return -date;
+      }
+      return date;
     }
-    goals.each(this.addGoal,this);
+    _.each(goals.sort({silent:true}).where({archived:false}),this.addGoal,this);
   }
 
 });

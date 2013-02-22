@@ -30,7 +30,8 @@ $(function ($, _, Backbone) {
       hashtag: '#newgoal',
       description: 'Double click to enter a description...',
       parent_id: '',
-      progress: 0
+      progress: 0,
+      archived: false
     }
 
   });

@@ -14,6 +14,7 @@ app.MainView = Backbone.View.extend({
     this.input = this.$('#new-goal');
     this.action = this.$('#archive');
 
+    /*
     $(window).scroll( function(){
       var offset = $(window).scrollTop();
       if (offset <= 0) {
@@ -26,6 +27,7 @@ app.MainView = Backbone.View.extend({
         $('#mentions').css('top', 0);
       }
     });
+*/
 
     window.app.Users.on( 'reset', this.addAll, this );
 

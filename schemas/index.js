@@ -16,7 +16,8 @@ GoalSchema = new mongoose.Schema({
   link: String,
   created_at: Date,
   updated_at: Date,
-  mentions: [MentionSchema]
+  mentions: [MentionSchema],
+  archived: {type:Boolean, default: false}
 });
 
 /*

@@ -25,9 +25,15 @@ app.GoalView = Backbone.View.extend({
   },
 
   render: function() {
-    var json = this.model.toJSON();
-    json['completed'] = (this.model.get("progess") == 100) ? 'completed' : '';
-    this.$el.html( this.template(json));
+    this.$el.html( this.template(this.model.toJSON()));
+
+    if (this.model.get('progress') == 100) {
+      this.$el.addClass('completed');
+      var prog = this.$el.find('.prog');
+      prog.text('');
+      prog.addClass('icon-ok');
+    }
+
     this.input = this.$('.edit');
     return this;
   },
@@ -38,8 +44,9 @@ app.GoalView = Backbone.View.extend({
   },
 
   delete: function() {
-    this.options.user.get("goals").remove(this.model);
+    this.model.set('archived',true);
     this.options.user.save();
+    this.remove();
   },
 
   remove: function() {
