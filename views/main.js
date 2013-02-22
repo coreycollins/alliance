@@ -14,7 +14,9 @@ app.MainView = Backbone.View.extend({
     this.input = this.$('#new-goal');
     this.action = this.$('#archive');
 
-    this.setMentionsHeight();
+    $(window).resize(function() {
+      $('#mentions').css('height',window.innerHeight-80);
+    });
 
     window.app.Users.on( 'reset', this.addAll, this );
 
@@ -59,10 +61,6 @@ app.MainView = Backbone.View.extend({
       }
     });
     user.save();
-  },
-
-  setMentionsHeight: function(){
-    $('#mentions').css('height',window.innerHeight-80);
   }
-
+  
 });
