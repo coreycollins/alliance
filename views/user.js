@@ -44,6 +44,7 @@ app.UserView = Backbone.View.extend({
       $(user).removeClass('selected');
     });
     this.$el.addClass('selected');
+    //$('.select-bar').css('left', this.$el.position().left);
 
     $('#mentions-list').html('');
   },

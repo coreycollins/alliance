@@ -211,7 +211,8 @@ app.GoalView = Backbone.View.extend({
     'dblclick .description' : 'edit',
     'keypress .edit': 'updateOnEnter',
     'blur .edit': 'close',
-    'click' : 'highlight'
+    'click .details' : 'highlight',
+    'click .action' : 'delete'
   },
 
   initialize: function() {
@@ -233,6 +234,11 @@ app.GoalView = Backbone.View.extend({
     this.input.focus();
   },
 
+  delete: function() {
+    this.options.user.get("goals").remove(this.model);
+    this.options.user.save();
+  },
+
   remove: function() {
     this.$el.remove();
     if (this.$el.hasClass('active')) {
@@ -248,11 +254,16 @@ app.GoalView = Backbone.View.extend({
   },
 
   highlight: function() {
-    _.each($('.goal'), function(goal){
-      $(goal).removeClass('active');
-    });
-    this.$el.addClass('active');
-    this.addAllMentions();
+    if (this.$el.hasClass('active')) {
+      this.$el.removeClass('active');
+      $('#mentions').hide();
+    }
+    else {
+      $('.goal.active').removeClass('active');
+      this.$el.addClass('active');
+      $('#mentions').show();
+      this.addAllMentions();
+    }
   },
 
     // Close the `"editing"` mode, saving changes to the todo.
@@ -306,6 +317,19 @@ app.MainView = Backbone.View.extend({
     this.input = this.$('#new-goal');
     this.action = this.$('#archive');
 
+    $(window).scroll( function(){
+      var offset = $(window).scrollTop();
+      if (offset <= 0) {
+        $('#mentions').css('top', 80);
+      }
+      else if (offset <= 80) {
+        $('#mentions').css('top', 80-offset);
+      }
+      else {
+        $('#mentions').css('top', 0);
+      }
+    });
+
     window.app.Users.on( 'reset', this.addAll, this );
 
     window.app.Users.fetch();
@@ -349,7 +373,7 @@ app.MainView = Backbone.View.extend({
       }
     });
     user.save();
-  },
+  }
 
 });
 
@@ -430,6 +454,7 @@ app.UserView = Backbone.View.extend({
       $(user).removeClass('selected');
     });
     this.$el.addClass('selected');
+    //$('.select-bar').css('left', this.$el.position().left);
 
     $('#mentions-list').html('');
   },

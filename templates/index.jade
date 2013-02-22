@@ -1,29 +1,33 @@
 extends layout
 
 block content
+
   #main
     #sidebar
-      ul#user-list
+      #logo The Alliance
+      #user-list
     #content
       <input id="new-goal" placeholder="Hashtag for new goal...">
+      //button#archive.btn.btn-primary Archive
+
       ul#goals-list
-    #mentions
-      button#archive.btn.btn-primary Archive
+    #mentions  
       ul#mentions-list
-  #logo.pull-right The Alliance
+
 
 
 block templates
   script#user-template(type="text/template")
-    | <img src="<%= link %>" />
+    <img src="<%= link %>" />
+    .bar
   script#goal-template(type="text/template")
-    .action
-      <input type="checkbox" class="checkbox">
+    <div class="prog <%= completed %>"> <%= progress %>%</div>
     .details
       div.hashtag <%= hashtag %>
       div.description <%= description %>
       <input class="edit" value="<%= description %>">
-    <div class="prog <%= completed %>"> <%= progress %>%</div>
+    .action
+      i.icon-remove
   script#mention-template(type="text/template")
     .message <%= message %>
     .seperator . . .
