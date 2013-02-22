@@ -14,6 +14,8 @@ var ACCESS_TOKEN = 'AAAITmIjTER0BABlbDZCjuTTpbsg8YOkzpISbZBB7ZCCSI04UyA3xgcZBttH
 
 mongoose.connect("127.0.0.1", "alliance", 27017);
 
+var USERS = 6
+
 function getMembers() {
   request("https://graph.facebook.com/409434605800948/members?access_token="+ACCESS_TOKEN, function(error, response, body) {
     if (!error && response.statusCode == 200) {
@@ -41,73 +43,91 @@ function getMembers() {
   });
 };
 
+function createMention(user, post, hashtag, goal, callback) {
+  var link = post.actions[0].link;
+  var mention = _.find(goal.mentions, function(m){ return m.post_id == post.id; });
+  if (!mention) {
+    goal.mentions.push({link:link, message:post.message, post_id:post.id, created_at: new Date()});
+    user.save(function(err, user){
+      console.log("Saved Mention.");
+      callback();
+    });
+  }
+  else {
+    callback();
+  }
+}
+
+function createGoal(user, post, hashtag, callback){
+  var link = post.actions[0].link;
+
+  if (post.likes && post.likes.count > (USERS)) {
+    var mention = {link:link, message:post.message, post_id:post.id, created_at: new Date()};
+    goal = {hashtag:hashtag, description: post.message, created_at: new Date(), mentions:[mention]};
+
+    user.goals.push(goal);
+    
+    user.save(function(err, user){
+      console.log("Saved Goal.");
+      callback();
+    });
+  }
+  else {
+    callback();
+  }
+
+};
+
+function parsePost(post, callback){
+  var match = post.message.match(/.*(#\w+).*/);
+  if (match) {
+
+    User.findOne({fb_id:post.from.id}, function(err, user){
+      var hashtags = post.message.match(/(#\w+)/g);
+
+      if (hashtags.length > 0) {
+        _.each(hashtags, function(hashtag){
+          console.log(hashtag);
+
+          //////////// Split hashtag to get progress and hashtag
+          var splits = hashtag.split('_');
+          var progress;
+          if (splits.length > 1) { 
+            progress = _.last(splits); 
+            hashtag = hashtag.replace(("_"+progress),''); 
+          }
+          ////////////
+
+          var goal = _.find(user.goals, function(g){ return g.hashtag == hashtag; });
+
+          if (!goal && !progress) {
+            createGoal(user, post, hashtag, callback);
+          }
+          else if(goal) {
+            goal.progress = progress ? progress : goal.progress;
+            createMention(user, post, hashtag, goal, callback);
+          }
+          else {
+            callback();
+          }
+
+        });
+      }
+      else { callback(); }
+
+    });
+  }
+  else { 
+    callback();
+  }
+};
+
 function getGoals(){
   request("https://graph.facebook.com/409434605800948/feed?access_token="+ACCESS_TOKEN, function(error, response, body) {
     if (!error && response.statusCode == 200) {
       var data = JSON.parse(body);
       var posts = _.sortBy(data.data, function(post){ return new Date(post.created_time); });
-      async.eachSeries(posts, function(post, callback){
-
-        var match = post.message.match(/.*(#\w+).*/);
-        if (match) {
-          var hashtag = match[1];
-          User.count(function(err, count){
-
-            User.findOne({fb_id:post.from.id}, function(err, user){
-              var ids = post.id.split('_');
-              var link = "http://www.facebook.com/"+ids[0]+"/posts/"+ids[1];
-
-              var splits = hashtag.split('_');
-              var progress;
-              if (splits.length > 1) { 
-                progress = _.last(splits); 
-                hashtag = hashtag.replace(("_"+progress),''); 
-              }
-
-              var goal = _.find(user.goals, function(g){ return g.hashtag == hashtag; });
-
-              if (!goal && !progress) {
-                if (post.likes && post.likes.count > (count*.4999)) {
-                  var mention = {link:link, message:post.message, post_id:ids[1], created_at: new Date()};
-                  goal = {hashtag:match[1], description: post.message, created_at: new Date(), mentions:[mention]};
-
-                  user.goals.push(goal);
-                  
-                  user.save(function(err, user){
-                    console.log("Saved Goal.");
-                    callback();
-                  });
-                }
-                else {
-                  callback();
-                }
-              }
-              else if(goal) {
-                var mention = _.find(goal.mentions, function(m){ return m.post_id == ids[1]; });
-                if (!mention) {
-                  goal.progress = progress ? progress : goal.progress;
-                  goal.mentions.push({link:link, message:post.message, post_id:ids[1], created_at: new Date()});
-                  user.save(function(err, user){
-                    console.log("Saved Mention.");
-                    callback();
-                  });
-                }
-                else {
-                  callback();
-                }
-              }
-              else {
-                callback();
-              }
-
-            });
-
-          });
-        }
-        else { 
-          callback();
-        }
-      });
+      async.eachSeries(posts, parsePost);
     }
     else {
       console.log("Error: ", body);
