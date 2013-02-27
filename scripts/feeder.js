@@ -82,41 +82,45 @@ function createGoal(user, post, hashtag, callback){
 
 
 function parseComment(comment, callback) {
-  var hashtags = comment.message.match(/(#\w+)/g);
+  if (comment) {
+    var hashtags = comment.message.match(/(#\w+)/g);
 
-  if (hashtags) {
+    if (hashtags) {
 
-    User.findOne({fb_id:comment.from.id}, function(err, user){
-      if (hashtags.length > 0) {
-        _.each(hashtags, function(hashtag){
-          //console.log(hashtag);
-          //////////// Split hashtag to get progress and hashtag
-          var splits = hashtag.split('_');
-          var progress;
-          if (splits.length > 1) { 
-            progress = _.last(splits); 
-            hashtag = hashtag.replace(("_"+progress),''); 
-          }
-          ////////////
+      User.findOne({fb_id:comment.from.id}, function(err, user){
+        if (hashtags.length > 0) {
+          _.each(hashtags, function(hashtag){
+            //console.log(hashtag);
+            //////////// Split hashtag to get progress and hashtag
+            var splits = hashtag.split('_');
+            var progress;
+            if (splits.length > 1) { 
+              progress = _.last(splits); 
+              hashtag = hashtag.replace(("_"+progress),''); 
+            }
+            ////////////
 
-          var goal = _.find(user.goals, function(g){ return g.hashtag == hashtag; });
+            var goal = _.find(user.goals, function(g){ return g.hashtag == hashtag; });
 
-          if(goal) {
-            goal.progress = progress ? progress : goal.progress;
-            createMention(user, comment, hashtag, goal, callback);
-          }
-          else {
-            callback();
-          }
+            if(goal) {
+              goal.progress = progress ? progress : goal.progress;
+              createMention(user, comment, hashtag, goal, callback);
+            }
+            else {
+              callback();
+            }
 
-        });
-      }
-      else { callback(); }
+          });
+        }
+        else { callback(); }
 
-    });
+      });
 
+    }
+    else { callback(); }
   }
   else { callback(); }
+
 };
 
 function parseMain(post, callback){
@@ -167,14 +171,15 @@ function parseMain(post, callback){
 function parsePost(post, callback) {
 
   parseMain(post, function(){
-
+    /*
     // Now parse comments
     var comments = post.comments.data;
     if (comments && comments.length > 0) {
       async.eachSeries(comments, parseComment, callback);
     }
     else { callback(); }
-
+    */
+    callback();
   });
 }
 
