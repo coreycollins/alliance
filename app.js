@@ -18,23 +18,16 @@ app.configure(function () {
   app.use(app.router);
 });
 
-var port;
-
 app.configure('development', function () {
   watcher.packageFiles();
   app.use(express.errorHandler());
   watcher.watch();
-  port = 3000;
-});
-
-app.configure('production', function () {
-  port = 80;
 });
 
 routes.init(app);
 
 mongoose.connect("127.0.0.1", "alliance", 27017);
 
-http.createServer(app).listen(port);
+http.createServer(app).listen(3001);
 
-console.log("Express server listening on port "+port);
+console.log("Express server listening on port 3001");
